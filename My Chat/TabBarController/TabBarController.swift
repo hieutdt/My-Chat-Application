@@ -17,6 +17,14 @@ class TabBarController: UITabBarController, MDCBottomNavigationBarDelegate {
         super.viewDidLoad()
         
         // Set up the view
+        let homeVC = HomeViewController()
+        homeVC.title = "Home"
+        let profileVC = ProfileViewController()
+        profileVC.title = "Profile"
+        let friendVC = FriendViewController()
+        friendVC.title = "Friend list"
+        
+        self.viewControllers = [homeVC, friendVC, profileVC]
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,6 +62,8 @@ class TabBarController: UITabBarController, MDCBottomNavigationBarDelegate {
     
     func bottomNavigationBar(_ bottomNavigationBar: MDCBottomNavigationBar, didSelect item: UITabBarItem) {
         self.selectedIndex = item.tag
+        
+        
     }
     
     override func viewWillLayoutSubviews() {
