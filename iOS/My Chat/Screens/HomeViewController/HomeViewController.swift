@@ -9,7 +9,6 @@
 import Foundation
 import SwiftUI
 
-
 class HomeViewController: UIViewController {
     
     @IBOutlet weak var cameraButton: UIButton!
@@ -20,8 +19,8 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var chatTable: UITableView!
     
     private var currentUser:User?
-    private var chatList:Array<Chat>?
-    private var rowList:Array<ChatTableRow>?
+    private var chatList:Array<Chat?>?
+    private var rowList:Array<UITableViewCell>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +28,8 @@ class HomeViewController: UIViewController {
         view!.backgroundColor = .white
         
         currentUser = ProfileBusiness.shared.getCurrentUser()
+        
+        ChatBusiness.shared.fetchListOfChatBoxListener = self
         
         chatTable.delegate = self
         chatTable.dataSource = self
@@ -49,16 +50,9 @@ class HomeViewController: UIViewController {
         self.searchBoxView.backgroundColor = UIColor.init(displayP3Red: 229/255, green: 231/255, blue: 233/255, alpha: 1)
         
         PhotoHelper.shared.asyncLoadingPhoto(url: currentUser?.avatarUrl, imageView: avatarImageView!)
-        
-        let firstChat = Chat(name: "Trương Hiền Minh", lastMessenger: "Cái dkm m điên à :)", messState: "STATE_SEEN", friendIsOnline: true)
-        let secondChat = Chat(name: "Lộc Võ", lastMessenger: "Đkm Lộc óc chó vl", messState: "STATE_SENT", friendIsOnline: true)
-        let thirdChat = Chat(name: "Anh Dũng Phạm Văn", lastMessenger: "Ê Hiếu bài này làm sao?", messState: "STATE_SEEN", friendIsOnline: false)
+        ChatBusiness.shared.fetchListOfChatBox(user: currentUser)
         
         chatList = Array()
-        chatList?.append(firstChat)
-        chatList?.append(secondChat)
-        chatList?.append(thirdChat)
-        
         rowList = Array()
         
         chatTable.reloadData()
@@ -79,6 +73,10 @@ class HomeViewController: UIViewController {
     @IBAction func avatarImageViewTapped(_ sender: Any) {
         self.navigationController?.pushViewController(ProfileViewController(), animated: true)
     }
+    
+    func reloadData() {
+        self.chatTable.reloadData()
+    }
 }
 
 extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
@@ -88,26 +86,56 @@ extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell.init()
+        let cell = UITableViewCell.init(style: .subtitle, reuseIdentifier: "")
         cell.heightAnchor.constraint(equalToConstant: 90).isActive = true
         cell.contentMode = .center
         
         let tableRowView = ChatTableRow()
-        tableRowView.setUpViewWith(name: chatList?[indexPath.row].name, lastMess: chatList?[indexPath.row].lastMessenger, messState: chatList?[indexPath.row].messState)
-        rowList!.append(tableRowView)
+        tableRowView.setUpViewWith(name: chatList?[indexPath.row]?.name, lastMess: chatList?[indexPath.row]?.lastMessenger, messState: chatList?[indexPath.row]?.messState, avatarUrl: chatList?[indexPath.row]?.avatarUrl)
+        rowList!.append(cell)
         
-        cell.contentMode = .scaleAspectFill
+        let button = UIButton(frame: cell.bounds)
+        cell.addSubview(button)
+        button.addTarget(self, action: #selector(cellTouchDownHandle(sender:)), for: .touchDown)
+        
+        cell.contentMode = .scaleToFill
         cell.addSubview(tableRowView)
-        LayoutHelper.shared.fitToParent(view: tableRowView)
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
     }
     
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
         return false
+    }
+    
+    @objc func cellTouchDownHandle(sender:UIButton) {
+        for (i,cell) in rowList!.enumerated() {
+            if cell == sender.superview {
+                let vc = ChatBoxViewController()
+                vc.currentUser = ProfileBusiness.shared.getCurrentUser()
+                vc.currentChatBox = chatList?[i]
+                let ids = chatList?[i]?.chatId?.components(separatedBy: "_")
+                vc.friendId = ids![1]
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true, completion: nil)
+            }
+        }
+    }
+}
+
+extension HomeViewController : FetchListOfChatBoxListener {
+    func fetchListOfChatBoxDidStart() {
+        
+    }
+    
+    func fetchListOfChatBoxDidEnd(chatList: Array<Chat?>) {
+        self.chatList = chatList
+        let chatTwo = Chat(chatId: "hello", name: "DUUMMAAAAA", lastMessenger: "Xin chào cậu", messState: "SENT_FROM_YOU", friendIsOnline: false, ts: 0, avatarUrl: "")
+        self.chatList?.append(chatTwo)
+        
+        self.reloadData()
     }
 }

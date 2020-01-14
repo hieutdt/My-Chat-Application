@@ -18,7 +18,6 @@ class ChatTableRow : UIView {
     @IBOutlet weak var messStateImageView: UIImageView!
     
     private var rippleView: MDCRippleView?
-    private var touchControl: UIControl?
     
     public var name:String?
     public var messenger:String?
@@ -41,54 +40,27 @@ class ChatTableRow : UIView {
         self.addSubview(contentView)
         LayoutHelper.shared.fitToParent(view: contentView)
         
-        rippleView = MDCRippleView()
-        rippleView?.rippleColor = .red
-        self.addSubview(rippleView!)
-        LayoutHelper.shared.fitToParent(view: rippleView!)
-        
-        touchControl = UIControl(frame: self.bounds)
-        touchControl?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.addSubview(touchControl!)
-        touchControl?.addTarget(self, action: Selector(("touchDown")), for: .touchDown)
-        touchControl?.addTarget(self, action: Selector(("touchUpInside")), for: .touchUpInside)
-        touchControl?.addTarget(self, action: Selector(("touchUpOutsize")), for: .touchUpOutside)
-        touchControl?.addTarget(self, action: Selector(("touchCancel")), for: .touchCancel)
-        
         let stateIcon = UIImage.init(named: "checked")!.withTintColor(.darkGray)
         messStateImageView.image = stateIcon
         
-        avatarImageView.image = UIImage.init(named: "avatar")
         avatarImageView.layer.cornerRadius = avatarImageView.frame.height/2
     }
     
-    public func setUpViewWith(name:String!, lastMess mess:String!, messState:String!) {
+    public func setUpViewWith(name:String!, lastMess mess:String!, messState:String!, avatarUrl:String!) {
         nameLabel.text = name;
         messLabel.text = mess;
-        if messState == "STATE_SENT" {
+        if messState == "SENT_FROM_YOU" {
             messStateImageView.isHidden = false
-        } else if messState == "STATE_SEEN" {
+            messStateImageView.image = UIImage.init(named: "checked")!.withTintColor(.darkGray)
+        } else if messState == "SENT_FROM_FRIEND" {
+            messStateImageView.isHidden = false
+        } else if messState == "SEEN_FROM_YOU" {
             messStateImageView.isHidden = true
+        } else if messState == "SEEN_FROM_FRIEND" {
+            messStateImageView.isHidden = false
+            PhotoHelper.shared.asyncLoadingPhoto(url: avatarUrl, imageView: messStateImageView)
         }
-    }
-    
-    public func beginRippleEffect() {
-        rippleView?.beginRippleTouchDown(at: CGPoint(x: 0,y: 0), animated: true, completion: nil);
-    }
-    
-    //
-    @objc private func touchDown() {
-        rippleView?.beginRippleTouchDown(at: .zero, animated: true, completion: nil)
-    }
-    
-    @objc private func touchUpInside() {
-        rippleView?.beginRippleTouchUp(animated: true, completion: nil)
-    }
-    
-    private func touchUpOutsize() {
-        rippleView?.beginRippleTouchUp(animated: true, completion: nil)
-    }
-    
-    private func touchCancel() {
-        rippleView?.beginRippleTouchUp(animated: true, completion: nil)
+        
+        PhotoHelper.shared.asyncLoadingPhoto(url: avatarUrl, imageView: avatarImageView)
     }
 }
