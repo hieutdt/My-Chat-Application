@@ -26,7 +26,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iLg-IQ-9px" userLabel="HEADER VIEW">
                     <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="avatar" translatesAutoresizingMaskIntoConstraints="NO" id="NiF-V5-s7W">
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="NiF-V5-s7W">
                             <rect key="frame" x="20" y="40" width="40" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="JkM-HX-Qem"/>
@@ -171,7 +171,6 @@
         </view>
     </objects>
     <resources>
-        <image name="avatar" width="540" height="540"/>
         <image name="search" width="256" height="256"/>
     </resources>
 </document>

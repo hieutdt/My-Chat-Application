@@ -9,15 +9,20 @@
 import Foundation
 import UIKit
 import FacebookLogin
+import Firebase
+import FirebaseDatabase
 
 class LogInViewController : UIViewController {
     
     @IBOutlet var loginButton: UIButton!
     @IBOutlet var loginView: UIView!
     @IBOutlet var signUpFacebookButton: UIButton!
+    private var whiteView:UIView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        ProfileBusiness.shared.fetchFacebookDataListener = self
         
         let loginButton = FBLoginButton(frame: loginView.bounds, permissions: [.publicProfile])
         loginButton.center = loginView.center
@@ -29,8 +34,11 @@ class LogInViewController : UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
         
         if ProfileBusiness.shared.hasLoggedInUser() {
-            self.navigationController?.popViewController(animated: false)
-            self.navigationController?.pushViewController(TabBarController(), animated: false)
+            whiteView = UIView(frame: self.view.bounds)
+            whiteView?.backgroundColor = .white
+            self.view.addSubview(whiteView!)
+            
+            ProfileBusiness.shared.fetchFacebookData()
         }
     }
     
@@ -48,23 +56,23 @@ class LogInViewController : UIViewController {
             )
             alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
 
-        case .failed(let error):
+        case .failed( _):
             alertController = UIAlertController(
-                title: "Login fail.",
-                message: "User login failed with error \(error)",
+                title: "Đăng nhập thất bại",
+                message: "",
                 preferredStyle: .alert
             )
             alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
 
-        case .success(let grantedPermissions, _, _):
+        case .success( _, _, _):
             alertController = UIAlertController(
-                title: "Login Success",
-                message: "Login success with \(grantedPermissions)",
+                title: "Đăng nhập thành công",
+                message: "",
                 preferredStyle: .alert
             )
+            
             alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: {(UIAlertAction)->Void in
-                self.navigationController?.popViewController(animated: false)
-                self.navigationController?.pushViewController(TabBarController(), animated: false)
+                ProfileBusiness.shared.fetchFacebookData()
             }))
         }
         self.present(alertController, animated: true, completion: nil)
@@ -79,6 +87,44 @@ class LogInViewController : UIViewController {
             self.loginManagerDidComplete(result)
         }
     }
-
 }
 
+extension LogInViewController : FetchFacebookDataListener {
+    func fetchFacebookDataDidStart() {
+        
+    }
+    
+    func fetchFacebookDataDidEnd(name: String!, avatarUrl: String!) {
+        ProfileBusiness.shared.createCurrentUser(id: AccessToken.current?.userID, name: name, state: "Online", avatarUrl: avatarUrl, friendList: Array())
+        
+        let user = ProfileBusiness.shared.getCurrentUser()
+        let userDictionary = user.getDictionary()
+        
+        var ref:DatabaseReference!
+        ref = Database.database().reference()
+        
+        ref?.child("users").child(user.id!).observe(.value, with: {(snapshot) in
+            // Data handle in Firebase
+            let dict = snapshot.value as? NSDictionary
+            if (dict) != nil {
+                let friendListArray = dict?["friendList"] as? Array<String?>
+                user.friendList = friendListArray
+                ProfileBusiness.shared.setCurrentUser(user: user)
+            } else {
+                ref?.child("users").child(user.id!).setValue(userDictionary)
+            }
+            
+            // Remove white view
+            if self.whiteView != nil{
+                self.whiteView?.removeFromSuperview()
+            }
+            
+            // Move to TabBarViewController
+            self.navigationController?.popViewController(animated: false)
+            self.navigationController?.pushViewController(TabBarController(), animated: false)
+            
+            // Remove observer
+            ref?.removeAllObservers()
+        })
+    }
+}

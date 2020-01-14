@@ -6,8 +6,12 @@ target 'My Chat' do
   use_frameworks!
   # Firebase
   pod 'Firebase/Analytics'
+  pod 'Firebase/Database'
+  
   pod 'FacebookCore'
   pod 'FacebookLogin'
+  
+  pod 'NVActivityIndicatorView'
 
   # Pods for My Chat
 

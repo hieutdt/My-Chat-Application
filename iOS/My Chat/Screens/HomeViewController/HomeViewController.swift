@@ -19,6 +19,7 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var searchBoxView: UIView!
     @IBOutlet weak var chatTable: UITableView!
     
+    private var currentUser:User?
     private var chatList:Array<Chat>?
     private var rowList:Array<ChatTableRow>?
     
@@ -26,6 +27,8 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         
         view!.backgroundColor = .white
+        
+        currentUser = ProfileBusiness.shared.getCurrentUser()
         
         chatTable.delegate = self
         chatTable.dataSource = self
@@ -44,6 +47,8 @@ class HomeViewController: UIViewController {
         
         self.searchBoxView.layer.cornerRadius = 25
         self.searchBoxView.backgroundColor = UIColor.init(displayP3Red: 229/255, green: 231/255, blue: 233/255, alpha: 1)
+        
+        PhotoHelper.shared.asyncLoadingPhoto(url: currentUser?.avatarUrl, imageView: avatarImageView!)
         
         let firstChat = Chat(name: "Trương Hiền Minh", lastMessenger: "Cái dkm m điên à :)", messState: "STATE_SEEN", friendIsOnline: true)
         let secondChat = Chat(name: "Lộc Võ", lastMessenger: "Đkm Lộc óc chó vl", messState: "STATE_SENT", friendIsOnline: true)

@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import UIKit
 
-class Chat {
+class Chat : NSObject  {
     public var name:String?
     public var lastMessenger:String?
     public var messState:String?

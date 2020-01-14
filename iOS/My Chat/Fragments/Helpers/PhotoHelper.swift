@@ -29,4 +29,15 @@ class PhotoHelper : NSObject {
         
         return newImage!
     }
+    
+    func asyncLoadingPhoto(url:String!, imageView:UIImageView!) {
+        let url = URL(string: url)
+
+        DispatchQueue.global().async {
+            let data = try? Data(contentsOf: url!)
+            DispatchQueue.main.async {
+                imageView.image = UIImage(data: data!)
+            }
+        }
+    }
 }
