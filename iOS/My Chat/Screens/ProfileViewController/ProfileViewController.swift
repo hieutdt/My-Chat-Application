@@ -10,9 +10,17 @@ import Foundation
 import UIKit
 
 class ProfileViewController : UIViewController {
+    @IBOutlet weak var avatarImageView: UIImageView!
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var backButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        avatarImageView.layer.cornerRadius = avatarImageView.frame.width/2
+        PhotoHelper.shared.asyncLoadingPhoto(url: ProfileBusiness.shared.getCurrentUser().avatarUrl, imageView: avatarImageView!)
+        
+        nameLabel.text = ProfileBusiness.shared.getCurrentUser().name
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -28,5 +36,9 @@ class ProfileViewController : UIViewController {
         alertController.addAction(UIAlertAction(title: "Không", style: .cancel, handler: nil))
         
         self.present(alertController, animated: true, completion:nil)
+    }
+    
+    @IBAction func backButtonTapped(_ sender: Any) {
+        self.navigationController?.popViewController(animated: true)
     }
 }

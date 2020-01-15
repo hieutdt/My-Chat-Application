@@ -50,12 +50,16 @@ class HomeViewController: UIViewController {
         self.searchBoxView.backgroundColor = UIColor.init(displayP3Red: 229/255, green: 231/255, blue: 233/255, alpha: 1)
         
         PhotoHelper.shared.asyncLoadingPhoto(url: currentUser?.avatarUrl, imageView: avatarImageView!)
-        ChatBusiness.shared.fetchListOfChatBox(user: currentUser)
         
         chatList = Array()
         rowList = Array()
         
+        self.rowList?.removeAll()
         chatTable.reloadData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        ChatBusiness.shared.fetchListOfChatBox(user: currentUser)
     }
     
     // MARK: Init Views
@@ -113,14 +117,16 @@ extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
     
     @objc func cellTouchDownHandle(sender:UIButton) {
         for (i,cell) in rowList!.enumerated() {
-            if cell == sender.superview {
-                let vc = ChatBoxViewController()
-                vc.currentUser = ProfileBusiness.shared.getCurrentUser()
-                vc.currentChatBox = chatList?[i]
-                let ids = chatList?[i]?.chatId?.components(separatedBy: "_")
-                vc.friendId = ids![1]
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: true, completion: nil)
+            if i < chatList!.count {
+                if cell == sender.superview {
+                    let vc = ChatBoxViewController()
+                    vc.currentUser = ProfileBusiness.shared.getCurrentUser()
+                    vc.currentChatBox = chatList?[i]
+                    let ids = chatList?[i]?.chatId?.components(separatedBy: "_")
+                    vc.friendId = ids![1]
+                    vc.modalPresentationStyle = .fullScreen
+                    self.present(vc, animated: true, completion: nil)
+                }
             }
         }
     }
@@ -133,9 +139,8 @@ extension HomeViewController : FetchListOfChatBoxListener {
     
     func fetchListOfChatBoxDidEnd(chatList: Array<Chat?>) {
         self.chatList = chatList
-        let chatTwo = Chat(chatId: "hello", name: "DUUMMAAAAA", lastMessenger: "Xin chào cậu", messState: "SENT_FROM_YOU", friendIsOnline: false, ts: 0, avatarUrl: "")
-        self.chatList?.append(chatTwo)
         
+        self.rowList?.removeAll()
         self.reloadData()
     }
 }

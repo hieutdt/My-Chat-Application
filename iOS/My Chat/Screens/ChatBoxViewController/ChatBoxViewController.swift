@@ -54,25 +54,6 @@ class ChatBoxViewController : UIViewController {
         collectionView.dataSource = self
         collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         
-        // Fetch all data once time
-        let messRef = Database.database().reference().child("messages").child((currentChatBox?.chatId!)!)
-        messRef.observeSingleEvent(of: .value, with:{(snapshot) in
-            for child in snapshot.children {
-                let snap = child as! DataSnapshot
-                let dict = snap.value as? NSDictionary
-                let fromId = dict!["fromId"] as? String
-                let toId = dict!["toId"] as? String
-                let seen = dict!["seen"] as? Bool
-                let ts = dict!["ts"] as? Int64
-                let message = dict!["message"] as? String
-                let id = dict!["id"] as? String
-                
-                let mess = Message(id:id!, from: fromId!, to: toId!, message: message!, ts: ts!, seen: seen!)
-                self.messages?.append(mess)
-                self.reloadData()
-            }
-        })
-        
         // Observer for chat message
         let ref = Database.database().reference().child("messages").child((currentChatBox?.chatId!)!)
         ref.observe(.childAdded, with: {(snapshot) in
@@ -132,8 +113,31 @@ class ChatBoxViewController : UIViewController {
         let timestamp = NSDate().timeIntervalSince1970
         let message = Message(id: randomStr, from: (currentUser?.id!)!, to: friendId!, message: textField.text!, ts: Int64(timestamp), seen: false)
         
-        let myRef = Database.database().reference().child("messages").child((currentChatBox?.chatId!)!)
+        // Update in Messages field
+        let myRef = Database.database().reference().child("messages").child("\(currentUser!.id!)_\(friendId!)")
         myRef.child(message.id!).setValue(message.getDictionary())
+        
+        let yourRef = Database.database().reference().child("messages").child("\(friendId!)_\(currentUser!.id!)")
+        yourRef.child(message.id!).setValue(message.getDictionary())
+        
+        //Update in Chatbox field
+        let myChatRef = Database.database().reference().child("chatbox").child(currentUser!.id!).child("\(currentUser!.id!)_\(friendId!)")
+        currentChatBox?.lastMessenger = textField.text!
+        currentChatBox?.ts = Int64(timestamp)
+        currentChatBox?.messState = "SENT_BY_YOU"
+        myChatRef.setValue(currentChatBox?.toDictionary())
+        
+        let chatBox = currentChatBox
+        chatBox?.messState = "SENT_BY_FRIEND"
+        chatBox?.friendIsOnline = true
+        chatBox?.name = currentUser?.name
+        chatBox?.avatarUrl = currentUser?.avatarUrl
+        chatBox?.chatId = "\(friendId!)_\(currentUser!.id!)"
+        chatBox?.lastMessenger = textField.text!
+        let yourChatRef = Database.database().reference().child("chatbox").child(friendId!).child("\(friendId!)_\(currentUser!.id!)")
+        yourChatRef.setValue(chatBox?.toDictionary())
+        
+        self.textField.text = ""
     }
 }
 
@@ -142,6 +146,22 @@ extension ChatBoxViewController : UICollectionViewDelegate ,UICollectionViewDele
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         
         cell.messageTextView.text = messages?[indexPath.row]?.message
+        if let messageText = self.messages?[indexPath.row]?.message {
+            let size = CGSize(width: view.frame.width, height: 1000)
+            let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+            let estimatedFrame = NSString(string: messageText).boundingRect(with: size, options: options, attributes:[NSAttributedString.Key.font:UIFont.systemFont(ofSize: 18)], context: nil)
+            
+            if (messages?[indexPath.row]?.fromId == currentUser?.id) {
+                cell.messageTextView.frame = CGRect(x: 8, y: 0, width: self.view.frame.width * 0.7, height: estimatedFrame.height + 20)
+                cell.messageTextView.textColor = .white
+                cell.bubbleView.frame = CGRect(x: self.view.frame.width*0.3 - 12, y: 0, width: self.view.frame.width * 0.7 + 10, height: estimatedFrame.height + 20)
+                cell.bubbleView.backgroundColor = blueColor
+            } else {
+                cell.messageTextView.frame = CGRect(x: 8, y: 0, width: self.view.frame.width * 0.7, height: estimatedFrame.height + 20)
+                cell.bubbleView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width * 0.7 + 10, height: estimatedFrame.height + 20)
+                cell.bubbleView.backgroundColor = UIColor(white:0.95, alpha: 1)
+            }
+        }
         
         return cell
     }
@@ -164,20 +184,35 @@ extension ChatBoxViewController : UICollectionViewDelegate ,UICollectionViewDele
 }
 
 class ChatMessageCell : BaseCell {
-    let messageTextView:UITextView = {
-        let textView = UITextView()
+    let messageTextView:UILabel = {
+        let textView = UILabel()
         textView.font = UIFont.systemFont(ofSize: 18)
         textView.text = "Sample message"
         textView.backgroundColor = UIColor.clear
+        textView.lineBreakMode = .byClipping
+        textView.numberOfLines = 15
+        textView.textColor = .black
         return textView
+    }()
+    
+    let bubbleView:UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(white:0.95, alpha: 1)
+        view.layer.cornerRadius = 15
+        view.layer.masksToBounds = true
+        return view
     }()
     
     override func setUpViews() {
         super.setUpViews()
         
-        backgroundColor = .lightGray
-        addSubview(messageTextView)
-        addConstraintWithFormat(format: "H:|[v0]|", views: messageTextView)
-        addConstraintWithFormat(format: "V:|[v0]|", views: messageTextView)
+        backgroundColor = .white
+        
+        addSubview(bubbleView)
+        bubbleView.addSubview(messageTextView)
+        messageTextView.topAnchor.constraint(equalTo: messageTextView.superview!.topAnchor).isActive = true
+        messageTextView.bottomAnchor.constraint(equalTo: messageTextView.superview!.bottomAnchor).isActive = true
+        messageTextView.leadingAnchor.constraint(equalTo: messageTextView.superview!.leadingAnchor, constant: 8).isActive = true
+        messageTextView.trailingAnchor.constraint(equalTo: messageTextView.superview!.trailingAnchor, constant: -8).isActive = true
     }
 }

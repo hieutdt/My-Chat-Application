@@ -26,8 +26,8 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Nhập tin nhắn..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="P7V-P2-jRl">
-                    <rect key="frame" x="0.0" y="856" width="364" height="40"/>
-                    <color key="backgroundColor" red="0.78382051196591607" green="0.78382051196591607" blue="0.78382051196591607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <rect key="frame" x="5" y="851" width="359" height="40"/>
+                    <color key="backgroundColor" red="0.87849656261246778" green="0.87849656261246778" blue="0.87849656261246778" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <fontDescription key="fontDescription" type="system" pointSize="26"/>
                     <textInputTraits key="textInputTraits"/>
                 </textField>
@@ -94,7 +94,7 @@
                     </constraints>
                 </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="1UZ-oi-9MB">
-                    <rect key="frame" x="0.0" y="85" width="414" height="771"/>
+                    <rect key="frame" x="0.0" y="85" width="414" height="761"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Wyp-gD-6D9">
                         <size key="itemSize" width="50" height="50"/>
@@ -104,7 +104,7 @@
                     </collectionViewFlowLayout>
                 </collectionView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="irA-RH-x0C">
-                    <rect key="frame" x="364" y="856" width="50" height="40"/>
+                    <rect key="frame" x="364" y="851" width="50" height="40"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="40" id="lU8-6h-278"/>
                     </constraints>
@@ -116,18 +116,18 @@
             </subviews>
             <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="P7V-P2-jRl" secondAttribute="bottom" id="2jz-Me-Oby"/>
+                <constraint firstAttribute="bottom" secondItem="P7V-P2-jRl" secondAttribute="bottom" constant="5" id="2jz-Me-Oby"/>
                 <constraint firstAttribute="trailing" secondItem="P7V-P2-jRl" secondAttribute="trailing" constant="50" id="DUY-cE-TEj"/>
                 <constraint firstAttribute="trailing" secondItem="1UZ-oi-9MB" secondAttribute="trailing" id="GKe-9E-Xdt"/>
                 <constraint firstItem="sjh-nR-RwH" firstAttribute="leading" secondItem="BeR-uM-eso" secondAttribute="leading" id="Ik5-04-Hgy"/>
-                <constraint firstItem="P7V-P2-jRl" firstAttribute="top" secondItem="1UZ-oi-9MB" secondAttribute="bottom" id="Jqu-WU-3vg"/>
+                <constraint firstItem="P7V-P2-jRl" firstAttribute="top" secondItem="1UZ-oi-9MB" secondAttribute="bottom" constant="5" id="Jqu-WU-3vg"/>
                 <constraint firstItem="1UZ-oi-9MB" firstAttribute="leading" secondItem="BeR-uM-eso" secondAttribute="leading" id="Jz7-Wo-sPU"/>
                 <constraint firstItem="1UZ-oi-9MB" firstAttribute="top" secondItem="sjh-nR-RwH" secondAttribute="bottom" constant="5" id="Kpk-wY-KfZ"/>
                 <constraint firstItem="sjh-nR-RwH" firstAttribute="trailing" secondItem="BeR-uM-eso" secondAttribute="trailing" id="U3d-qS-9Rn"/>
                 <constraint firstItem="irA-RH-x0C" firstAttribute="leading" secondItem="P7V-P2-jRl" secondAttribute="trailing" id="ZgV-Qq-Kqo"/>
-                <constraint firstItem="P7V-P2-jRl" firstAttribute="leading" secondItem="BeR-uM-eso" secondAttribute="leading" id="bud-bS-ujh"/>
+                <constraint firstItem="P7V-P2-jRl" firstAttribute="leading" secondItem="BeR-uM-eso" secondAttribute="leading" constant="5" id="bud-bS-ujh"/>
                 <constraint firstAttribute="trailing" secondItem="irA-RH-x0C" secondAttribute="trailing" id="ebt-84-ZQ2"/>
-                <constraint firstAttribute="bottom" secondItem="irA-RH-x0C" secondAttribute="bottom" id="o6S-ZA-mW5"/>
+                <constraint firstAttribute="bottom" secondItem="irA-RH-x0C" secondAttribute="bottom" constant="5" id="o6S-ZA-mW5"/>
                 <constraint firstItem="sjh-nR-RwH" firstAttribute="top" secondItem="BeR-uM-eso" secondAttribute="top" id="xqn-An-IVF"/>
             </constraints>
             <point key="canvasLocation" x="-166.66666666666669" y="-39.508928571428569"/>

@@ -54,7 +54,7 @@ class ChatBusiness: NSObject {
             
             self.fetchListOfChatBoxListener?.fetchListOfChatBoxDidEnd(chatList: chatList)
             
-//            ref.removeAllObservers()
+            ref.removeAllObservers()
         })
     }
     
@@ -70,13 +70,15 @@ class ChatBusiness: NSObject {
                 self.createNewChatBoxListener?.createNewChatBoxDidEnd(state: "Cuộc hội thoại đã tồn tại")
             } else {
                 let timestamp = NSDate().timeIntervalSince1970
-                let chatBox = Chat(chatId: "\(user.id!)_\(friend.id!)", name: friend.name!, lastMessenger: "", messState: "SEEN", friendIsOnline: false, ts: Int64(timestamp), avatarUrl: friend.avatarUrl!)
+                let chatBox = Chat(chatId: "\(user.id!)_\(friend.id!)", name: friend.name!, lastMessenger: "Hãy gửi tin nhắn chào bạn của mình nào!", messState: "SEEN", friendIsOnline: false, ts: Int64(timestamp), avatarUrl: friend.avatarUrl!)
                 let chatBoxDic = chatBox.toDictionary()
                 
                 ref.child("chatbox").child(user.id!).child("\(user.id!)_\(friend.id!)").setValue(chatBoxDic)
                 
                 self.createNewChatBoxListener?.createNewChatBoxDidEnd(state: "Tạo cuộc hội thoại thành công")
             }
+            
+            ref.removeAllObservers()
         })
     }
 }
